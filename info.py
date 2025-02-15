@@ -31,20 +31,20 @@ COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_files')
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 #----------- There will be channel id add in all these ---------
-LOG_API_CHANNEL = int(environ.get('LOG_API_CHANNEL', '0'))  
-BIN_CHANNEL = int(environ.get('BIN_CHANNEL','0'))
-DELETE_CHANNELS = int(environ.get('DELETE_CHANNELS','0'))
-LOG_VR_CHANNEL = int(environ.get('LOG_VR_CHANNEL', '0'))
-auth_channel = environ.get('AUTH_CHANNEL', '')
-SUPPORT_GROUP = int(environ.get('SUPPORT_GROUP', '0'))
-request_channel = environ.get('REQUEST_CHANNEL', '0')
-MOVIE_UPDATE_CHANNEL = int(environ.get('MOVIE_UPDATE_CHANNEL', '0'))
+LOG_API_CHANNEL = int(environ.get('LOG_API_CHANNEL', '-1002149166092'))  
+BIN_CHANNEL = int(environ.get('BIN_CHANNEL','-1002168067069'))
+DELETE_CHANNELS = int(environ.get('DELETE_CHANNELS','-1002168067069'))
+LOG_VR_CHANNEL = int(environ.get('LOG_VR_CHANNEL', '-1002149166092'))
+auth_channel = environ.get('AUTH_CHANNEL', '-1002238440461')
+SUPPORT_GROUP = int(environ.get('SUPPORT_GROUP', '-1002167777305'))
+request_channel = environ.get('REQUEST_CHANNEL', '-1002141866340')
+MOVIE_UPDATE_CHANNEL = int(environ.get('MOVIE_UPDATE_CHANNEL', '-1001986234690'))
 SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'https://t.me/riyasupportt') #Support group link ( make sure bot is admin )
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 IS_VERIFY = is_enabled('IS_VERIFY', False)
 #---------------------------------------------------------------
-TUTORIAL = environ.get("TUTORIAL", "https://t.me/")
+TUTORIAL = environ.get("TUTORIAL", "https://t.me/testingdb2/10")
 VERIFY_IMG = environ.get("VERIFY_IMG", "https://graph.org/file/1669ab9af68eaa62c3ca4.jpg")
 SHORTENER_API = environ.get("SHORTENER_API", "raXBls27RSYrdSsLIpwfjmR8Bm62")
 SHORTENER_WEBSITE = environ.get("SHORTENER_WEBSITE", 'api.shareus.io')
