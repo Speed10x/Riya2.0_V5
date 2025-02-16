@@ -31,10 +31,10 @@ COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_files')
 #---------------------------------------------------------------
 #---------------------------------------------------------------
 #----------- There will be channel id add in all these ---------
-LOG_API_CHANNEL = int(environ.get('LOG_API_CHANNEL', '0'))  
-BIN_CHANNEL = int(environ.get('BIN_CHANNEL','-1002168067069'))
-DELETE_CHANNELS = int(environ.get('DELETE_CHANNELS','0'))
-LOG_VR_CHANNEL = int(environ.get('LOG_VR_CHANNEL', '0'))
+LOG_API_CHANNEL = int(environ.get('LOG_API_CHANNEL', '-1002221251113'))  
+BIN_CHANNEL = int(environ.get('BIN_CHANNEL','-1002496570051'))
+DELETE_CHANNELS = int(environ.get('DELETE_CHANNELS','-1002168067069'))
+LOG_VR_CHANNEL = int(environ.get('LOG_VR_CHANNEL', '-1002218738984'))
 auth_channel = environ.get('AUTH_CHANNEL', '-1002238440461')
 SUPPORT_GROUP = int(environ.get('SUPPORT_GROUP', '-1002167777305'))
 request_channel = environ.get('REQUEST_CHANNEL', '-1002141866340')
@@ -105,7 +105,7 @@ if 'DYNO' in environ:
     ON_HEROKU = True
 else:
     ON_HEROKU = False
-URL = environ.get("FQDN", "https://married-marena-aerofilms-8547b846.koyeb.app")
+URL = environ.get("FQDN", "https://married-marena-aerofilms-8547b846.koyeb.app/")
 
 #---------------------------------------------------------------
 #---------------------------------------------------------------
