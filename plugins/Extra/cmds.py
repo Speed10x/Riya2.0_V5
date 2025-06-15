@@ -3,7 +3,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, BotCommand
 from utils import is_check_admin
 from Script import script
-from info import ADMINS
+from info import ADMINS, admin_cmds, cmds
 
 
 @Client.on_message(filters.command('grp_cmds'))
@@ -25,58 +25,29 @@ async def grp_cmds(client, message):
         text=script.GROUP_C_TEXT,
         reply_markup=InlineKeyboardMarkup(buttons),
         parse_mode=enums.ParseMode.HTML
-        )
-    
-
-@Client.on_message(filters.command("admin_cmds") & filters.user(ADMINS))
-async def admin_cmds(client, message):
-    buttons = [
-        [KeyboardButton("/add_premium"), KeyboardButton("/premium_users")],
-        [KeyboardButton("/remove_premium"), KeyboardButton("/add_redeem")],
-        [KeyboardButton("/refresh"), KeyboardButton("/set_muc")],
-        [KeyboardButton("/pm_search_on"), KeyboardButton("/pm_search_off")],
-        [KeyboardButton("/set_ads"), KeyboardButton("/del_ads")],
-        [KeyboardButton("/setlist"), KeyboardButton("/clearlist")],
-        [KeyboardButton("/verify_id"), KeyboardButton("/index")],
-        [KeyboardButton("/send"), KeyboardButton("/leave")],
-        [KeyboardButton("/ban"), KeyboardButton("/unban")],
-        [KeyboardButton("/broadcast"), KeyboardButton("/grp_broadcast")],
-        [KeyboardButton("/delreq"), KeyboardButton("/channel")],
-        [KeyboardButton("/del_file"), KeyboardButton("/delete")],
-        [KeyboardButton("/deletefiles"), KeyboardButton("/deleteall")],
-        [KeyboardButton("All These Commands Can Be Used Only By Admins.")],
-        [KeyboardButton("⚡")]
-    ]
-    reply_markup = ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
-   
-    sent_message = await message.reply(
-        "<b>Admin All Commands [auto delete 2 min] 👇</b>",
-        reply_markup=reply_markup,
-    ) 
-    #  2 minutes (120 seconds)
-    await asyncio.sleep(120)
-    await sent_message.delete()
-    await message.delete()
-
+    )
 
 @Client.on_message(filters.command("commands") & filters.user(ADMINS))
 async def set_commands(client, message):
-    commands = [
-        BotCommand("start", "Start The Bot"),
-        BotCommand("most", "Get Most Searches Button List"),
-        BotCommand("trend", "Get Top Trending Button List"),
-        BotCommand("mostlist", "Show Most Searches List"),
-        BotCommand("trendlist", "𝖦𝖾𝗍 𝖳𝗈𝗉 𝖳𝗋𝖾𝗇𝖽𝗂𝗇𝗀 𝖡𝗎𝗍𝗍𝗈𝗇 𝖫𝗂𝗌t"),
-        BotCommand("plan", "Check Available Premium Membership Plans"),
-        BotCommand("myplan", "Check Your Currunt Plan"),
-        BotCommand("refer", "To Refer Your Friend And Get Premium"),
-        BotCommand("stats", "Check My Database"),
-        BotCommand("id", "Get Telegram Id"),
-        BotCommand("font", "To Generate Cool Fonts"),
-        BotCommand("details", "Check Group Details"),
-        BotCommand("settings", "Change Bot Setting"),
-        BotCommand("grp_cmds", "Check Group Commands"),
-        BotCommand("admin_cmds", "Bot Admin Commands")
-    ]
+    commands = []
+    for item in cmds:
+        for command, description in item.items():
+            commands.append(BotCommand(command, description))
     await client.set_bot_commands(commands)
     await message.reply("Set command successfully✅ ")
+
+@Client.on_message(filters.command("admin_cmds") & filters.user(ADMINS))
+async def admin_cmds_handler(client, message):
+    try:
+        admin_footer = "\n\nAll These Commands Can Be Used Only By Admins.\n⚡ Powered by @JISSHU_BOTS"        
+        commands_list = "\n".join(f"{i+1}. {cmd}" for i, cmd in enumerate(admin_cmds))
+        sent_message = await message.reply(
+            f"<b>Admin All Commands [auto delete in 2 minutes] 👇</b>\n\n{commands_list}{admin_footer}"
+        )        
+        await asyncio.sleep(120)
+        await sent_message.delete()
+        await message.delete()
+    except Exception as e:
+        print(f"Error in admin_cmds_handler: {e}")
+        await message.reply("An error occurred while displaying admin commands.")
+        
