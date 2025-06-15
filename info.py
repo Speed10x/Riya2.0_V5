@@ -75,7 +75,7 @@ YEARS = [f'{i}' for i in range(2025, 2002,-1 )]
 SEASONS = [f'season {i}'for i in range (1 , 23)]
 
 # Pictures And Reaction
-START_IMG = (environ.get('START_IMG', 'https://te.legra.ph/file/ff723c97db78d93ed2c4a-f6fd9a868aaae33953.jpg')).split()
+START_IMG = (environ.get('START_IMG', 'https://te.legra.ph/file/cb5136066d90d1707e9f0-ef6036daba37db679a.jpg https://te.legra.ph/file/71e089fb340a345cd5284-33e31f4d1dc9914b64.jpg')).split()
 FORCESUB_IMG = environ.get('FORCESUB_IMG', 'https://i.ibb.co/ZNC1Hnb/ad3f2c88a8f2.jpg')
 REFER_PICS = (environ.get("REFER_PICS", "https://envs.sh/PSI.jpg")).split() 
 PAYPICS = (environ.get('PAYPICS', 'https://telegra.ph/paytohemantfam-07-20')).split()
