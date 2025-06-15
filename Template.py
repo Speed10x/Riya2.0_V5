@@ -4,7 +4,7 @@ class jisshu_template(object):
     JISSHU_NAME = "PRIMEFLIX"
 
     JISSHU_DISCLAIMER = (
-        "This website only provides a service to help you play your video online without downloading. "
+        "This website only provides a service to help you play your video online without downloading.. "
         "You can report files or videos that contain issues like copyright infringement, +18 content, violence, etc."
     )
 
