@@ -14,7 +14,7 @@ import time
 async def save_group(bot, message):
     check = [u.id for u in message.new_chat_members]
     if temp.ME in check:
-        if (str(message.chat.id)).startswith("-100") and not await db.get_chat(message.chat.id):
+        if not await db.get_chat(message.chat.id):
             total=await bot.get_chat_members_count(message.chat.id)
             user = message.from_user.mention if message.from_user else "Dear" 
             group_link = await message.chat.export_invite_link()
@@ -96,3 +96,16 @@ async def get_ststs(bot, message):
     ram = psutil.virtual_memory().percent
     cpu = psutil.cpu_percent()
     await message.reply_text(script.STATUS_TXT.format(users, groups, size, free, files, db2_size, db2_free, uptime, ram, cpu))
+
+
+@Client.on_message(filters.command("invite") & filters.private & filters.user(ADMINS))
+async def invite(client, message):
+    toGenInvLink = message.command[1]
+    if len(toGenInvLink) != 14:
+        return await message.reply("Invalid chat id\nAdd -100 before chat id if You did not add any yet.") 
+    try:
+        link = await client.export_chat_invite_link(toGenInvLink)
+        await message.reply(link)
+    except Exception as e:
+        print(f'Error while generating invite link : {e}\nFor chat:{toGenInvLink}')
+        await message.reply(f'Error while generating invite link : {e}\nFor chat:{toGenInvLink}')
