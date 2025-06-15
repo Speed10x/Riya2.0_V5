@@ -1,6 +1,6 @@
 import logging
 from pyrogram.errors import InputUserDeactivated, UserNotParticipant, FloodWait, UserIsBlocked, PeerIdInvalid
-from info import AUTH_CHANNEL, LONG_IMDB_DESCRIPTION, IS_VERIFY , SETTINGS , START_IMG
+from info import AUTH_CHANNEL, LONG_IMDB_DESCRIPTION, IS_VERIFY , START_IMG
 from imdb import Cinemagoer
 import asyncio
 from pyrogram.types import Message
@@ -32,9 +32,13 @@ class temp(object):
     CHAT = {}
     BANNED_USERS = []
     BANNED_CHATS = []
+
+
 def formate_file_name(file_name):
     file_name = ' '.join(filter(lambda x: not x.startswith('[') and not x.startswith('@') and not x.startswith('www.'), file_name.split()))
     return file_name
+ 
+
 async def is_req_subscribed(bot, query):
     if await db.find_join_req(query.from_user.id):
         return True
@@ -43,11 +47,24 @@ async def is_req_subscribed(bot, query):
     except UserNotParticipant:
         pass
     except Exception as e:
-        logger.exception(e)
+        print(e)
     else:
         if user.status != enums.ChatMemberStatus.BANNED:
             return True
     return False
+
+async def is_subscribed(bot, user_id, channel_id):
+    try:
+        user = await bot.get_chat_member(channel_id, user_id)
+    except UserNotParticipant:
+        pass
+    except Exception as e:
+        pass
+    else:
+        if user.status != enums.ChatMemberStatus.BANNED:
+            return True
+    return False
+
 
 async def get_poster(query, bulk=False, id=False, file=None):
     if not id:
@@ -141,7 +158,8 @@ async def users_broadcast(user_id, message, is_pin):
         logging.info(f"{user_id}-Removed from Database, since deleted account.")
         return False, "Deleted"
     except UserIsBlocked:
-        logging.info(f"{user_id} -Blocked the bot.")
+        await db.delete_user(int(user_id))
+        logging.info(f"{user_id} - Removed from Database, since Blocked the bot.")
         await db.delete_user(user_id)
         return False, "Blocked"
     except PeerIdInvalid:
@@ -165,20 +183,17 @@ async def groups_broadcast(chat_id, message, is_pin):
         return await groups_broadcast(chat_id, message)
     except Exception as e:
         await db.delete_chat(chat_id)
+        logging.info(f"{chat_id}-Removed from Database.")
         return "Error"
 
-async def get_settings(group_id , pm_mode = False):
-    if pm_mode:
-        return SETTINGS.copy()
-    else:
-        settings = await db.get_settings(group_id)
-    return settings 
+async def get_settings(group_id):
+    settings = await db.get_settings(int(group_id))
+    return settings
     
 async def save_group_settings(group_id, key, value):
     current = await get_settings(group_id)
-    current.update({key: value})
-    temp.SETTINGS.update({group_id: current})
-    await db.update_settings(group_id, current)
+    current[key] = value
+    await db.update_settings(group_id, current) 
 
 def get_size(size):
     units = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB"]
@@ -202,24 +217,20 @@ def list_to_str(k):
         return ', '.join(str(item) for item in k)
 
 
-async def get_shortlink(link, grp_id, is_second_shortener=False, is_third_shortener=False , pm_mode=False):
-    if not pm_mode:
-        settings = await get_settings(grp_id)
+async def get_shortlink(link, grp_id, is_second_shortener=False, is_third_shortener=False):
+    settings = await get_settings(grp_id)
+    if is_third_shortener:             
+        api, site = settings['api_three'], settings['shortner_three']
     else:
-        settings = SETTINGS
-    if IS_VERIFY:
-        if is_third_shortener:             
-            api, site = settings['api_three'], settings['shortner_three']
+        if is_second_shortener:
+            api, site = settings['api_two'], settings['shortner_two']
         else:
-            if is_second_shortener:
-                api, site = settings['api_two'], settings['shortner_two']
-            else:
-                api, site = settings['api'], settings['shortner']
-        shortzy = Shortzy(api, site)
-        try:
-            link = await shortzy.convert(link)
-        except Exception as e:
-            link = await shortzy.get_quick_link(link)
+            api, site = settings['api'], settings['shortner']
+    shortzy = Shortzy(api, site)
+    try:
+        link = await shortzy.convert(link)
+    except Exception as e:
+        link = await shortzy.get_quick_link(link)
     return link
 
 def get_file_id(message: "Message") -> Any:
@@ -248,11 +259,11 @@ def get_status():
     tz = pytz.timezone('Asia/Colombo')
     hour = datetime.now(tz).time().hour
     if 5 <= hour < 12:
-        sts = "𝐺𝑜𝑜𝑑 𝑀𝑜𝑟𝑛𝑖𝑛𝑔"
+        sts = "ɢᴏᴏᴅ ᴍᴏʀɴɪɴɢ"
     elif 12 <= hour < 18:
-        sts = "𝐺𝑜𝑜𝑑 𝐴𝑓𝑡𝑒𝑟𝑛𝑜𝑜𝑛"
+        sts = "ɢᴏᴏᴅ ᴀꜰᴛᴇʀɴᴏᴏɴ"
     else:
-        sts = "𝐺𝑜𝑜𝑑 𝐸𝑣𝑒𝑛𝑖𝑛𝑔"
+        sts = "ɢᴏᴏᴅ ᴇᴠᴇɴɪɴɢ"
     return sts
 
 async def is_check_admin(bot, chat_id, user_id):
@@ -298,3 +309,8 @@ def get_readable_time(seconds):
             period_value, seconds = divmod(seconds, period_seconds)
             result += f'{int(period_value)}{period_name}'
     return result
+
+async def save_default_settings(id):
+    await db.reset_group_settings(id)
+    current = await db.get_settings(id)
+    temp.SETTINGS.update({id: current})
