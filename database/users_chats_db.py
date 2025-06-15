@@ -1,13 +1,15 @@
 import datetime
 import pytz
 from motor.motor_asyncio import AsyncIOMotorClient
-from info import SETTINGS, IS_PM_SEARCH, PREMIUM_POINT,REF_PREMIUM,IS_VERIFY, SHORTENER_WEBSITE3, SHORTENER_API3, THREE_VERIFY_GAP, LINK_MODE, FILE_CAPTION, TUTORIAL, DATABASE_NAME, DATABASE_URI, IMDB, IMDB_TEMPLATE, PROTECT_CONTENT, AUTO_DELETE, SPELL_CHECK, AUTO_FILTER, LOG_VR_CHANNEL, SHORTENER_WEBSITE, SHORTENER_API, SHORTENER_WEBSITE2, SHORTENER_API2, TWO_VERIFY_GAP
+#from info import SETTINGS, IS_PM_SEARCH, IS_SEND_MOVIE_UPDATE, PREMIUM_POINT,REF_PREMIUM,IS_VERIFY, SHORTENER_WEBSITE3, SHORTENER_API3, THREE_VERIFY_GAP, LINK_MODE, FILE_CAPTION, TUTORIAL, DATABASE_NAME, DATABASE_URI, IMDB, IMDB_TEMPLATE, PROTECT_CONTENT, AUTO_DELETE, SPELL_CHECK, AUTO_FILTER, LOG_VR_CHANNEL, SHORTENER_WEBSITE, SHORTENER_API, SHORTENER_WEBSITE2, SHORTENER_API2, TWO_VERIFY_GAP
 # from utils import get_seconds
+from info import *
+
 client = AsyncIOMotorClient(DATABASE_URI)
 mydb = client[DATABASE_NAME]
-fsubs = client['fsubs']
-class Database:
-    default = SETTINGS.copy()
+
+
+class Database:    
     def __init__(self):
         self.col = mydb.users
         self.grp = mydb.groups
@@ -18,9 +20,35 @@ class Database:
         self.mGrp = mydb.mGrp
         self.pmMode = mydb.pmMode
         self.jisshu_ads_link = mydb.jisshu_ads_link
-        self.grp_and_ids = fsubs.grp_and_ids
         self.movies_update_channel = mydb.movies_update_channel
         self.botcol = mydb.botcol
+
+
+    default = {
+            'spell_check': SPELL_CHECK,
+            'auto_filter': AUTO_FILTER,
+            'file_secure': PROTECT_CONTENT,
+            'auto_delete': AUTO_DELETE,
+            'template': IMDB_TEMPLATE,
+            'caption': FILE_CAPTION,
+            'tutorial': TUTORIAL,
+            'tutorial_2': TUTORIAL_2,
+            'tutorial_3': TUTORIAL_3,
+            'shortner': SHORTENER_WEBSITE,
+            'api': SHORTENER_API,
+            'shortner_two': SHORTENER_WEBSITE2,
+            'api_two': SHORTENER_API2,
+            'log': LOG_VR_CHANNEL,
+            'imdb': IMDB,
+            'fsub_id': AUTH_CHANNEL,
+            'link': LINK_MODE, 
+            'is_verify': IS_VERIFY, 
+            'verify_time': TWO_VERIFY_GAP,
+            'shortner_three': SHORTENER_WEBSITE3,
+            'api_three': SHORTENER_API3,
+            'third_verify_time': THREE_VERIFY_GAP
+    }
+    
     def new_user(self, id, name):
         return dict(
             id = id,
@@ -32,14 +60,13 @@ class Database:
             )
         )
 
-    async def get_settings(self, id):
-        chat = await self.grp.find_one({'id':int(id)})
-        if chat:
-            return chat.get('settings', self.default)
+    async def get_settings(self, group_id):
+        chat = await self.grp.find_one({'id': int(group_id)})
+        if chat and 'settings' in chat:
+            return chat['settings']
         else:
-            await self.grp.update_one({'id': int(id)}, {'$set': {'settings': self.default}} , upsert=True)
-        return self.default
-
+            return self.default.copy()
+        
     async def find_join_req(self, id):
         return bool(await self.req.find_one({'id': id}))
         
@@ -342,9 +369,10 @@ class Database:
         user_data = {"id": user_id, "expiry_time": expiry_time, "has_free_trial": True}
         await self.users.update_one({"id": user_id}, {"$set": user_data}, upsert=True)
             
-     # JISSHU BOTS = @IM_JISSHU
+     # JISSHU BOTS
     async def jisshu_set_ads_link(self,link):
         await self.jisshu_ads_link.update_one({} , {'$set': {'link': link}} , upsert=True)
+        
     async def jisshu_get_ads_link(self):
         link = await self.jisshu_ads_link.find_one({})
         if link is not None:
@@ -362,24 +390,21 @@ class Database:
         except Exception as e:
             print(f"Got err in db set : {e}")
             return False
-    
-    async def setFsub(self , grpID , fsubID):
-        return await self.grp_and_ids.update_one({'grpID': grpID} , {'$set': {'grpID': grpID , "fsubID": fsubID}}, upsert=True)    
-        
-    async def getFsub(self , grpID):
-        link = await self.grp_and_ids.find_one({"grpID": grpID})
-        if link is not None:
-            return link.get("fsubID")
-        else:
-            return None
-            
-    async def delFsub(self , grpID):
-        result =  await self.grp_and_ids.delete_one({"grpID": grpID})
-        if result.deleted_count != 0:
-            return True
-        else:
-            return False
 
+    async def get_send_movie_update_status(self, bot_id):
+        bot = await self.botcol.find_one({'id': bot_id})
+        if bot and bot.get('movie_update_feature'):
+            return bot['movie_update_feature']
+        else:
+            return IS_SEND_MOVIE_UPDATE
+
+    async def update_send_movie_update_status(self, bot_id, enable):
+        bot = await self.botcol.find_one({'id': int(bot_id)})
+        if bot:
+            await self.botcol.update_one({'id': int(bot_id)}, {'$set': {'movie_update_feature': enable}})
+        else:
+            await self.botcol.insert_one({'id': int(bot_id), 'movie_update_feature': enable})            
+            
     async def get_pm_search_status(self, bot_id):
         bot = await self.botcol.find_one({'id': bot_id})
         if bot and bot.get('bot_pm_search'):
@@ -402,5 +427,8 @@ class Database:
             else:
                 return None
         return await self.movies_update_channel.update_one({} , {'$set': {'id': id}} , upsert=True)
-db = Database()
 
+    async def reset_group_settings(self, id):
+        await self.grp.update_one({'id': int(id)}, {'$set': {'settings': self.default}})
+
+db = Database()
