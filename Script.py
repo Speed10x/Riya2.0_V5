@@ -65,7 +65,7 @@ BOT WORKING PROPERLY 🔥"""
 📅 Dᴀᴛᴇ : <code>{}</code>
 ⏰ Tɪᴍᴇ : <code>{}</code>
 🌐 Tɪᴍᴇᴢᴏɴᴇ : <code>Asia/Kolkata</code>
-🛠️ Bᴜɪʟᴅ Sᴛᴀᴛᴜs: <code>v5.1 [ Sᴛᴀʙʟᴇ ]</code>
+🛠️ Bᴜɪʟᴅ Sᴛᴀᴛᴜs: <code>v5.3 [ Sᴛᴀʙʟᴇ ]</code>
 
 Bʏ @maximize0</b>"""
         
