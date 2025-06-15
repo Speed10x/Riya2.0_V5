@@ -40,7 +40,7 @@ DATABASE_NAME = environ.get('DATABASE_NAME', "riyav5")
 
 # Files index database url
 FILES_DATABASE = environ.get('FILES_DATABASE', "mongodb+srv://Riyav5:Riyav5@riyav5.w4jva.mongodb.net/?retryWrites=true&w=majority&appName=riyav5")
-COLLECTION_NAME = environ.get('COLLECTION_NAME', 'jisshu')
+COLLECTION_NAME = environ.get('COLLECTION_NAME', 'riyav5')
 
 # Other Channel's
 SUPPORT_GROUP = int(environ.get('SUPPORT_GROUP', '-1002167777305'))
