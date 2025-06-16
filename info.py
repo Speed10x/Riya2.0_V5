@@ -39,7 +39,7 @@ DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://Riyav5:Riyav5@riyav5.w
 DATABASE_NAME = environ.get('DATABASE_NAME', "riyav5")
 
 # Files index database url
-FILES_DATABASE = environ.get('FILES_DATABASE', "mongodb+srv://riyav4:riyav4@cluster0.50dzn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+FILES_DATABASE = environ.get('FILES_DATABASE', "mongodb+srv://aero:aero@cluster0.rgv6t6k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Cluster0')
 
 # Other Channel's
